@@ -1,0 +1,156 @@
+---
+title: "How to use shapper for regression"
+author: "Alicja Gosiewska"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+vignette: >
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteIndexEntry{How to use shapper for regression}
+  %\usepackage[UTF-8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE,
+                      eval = FALSE)
+```
+
+# Introduction
+
+The `shapper` is an R package which ports the `shap` python library in R. For details and examples see [shapper repository on github](https://github.com/ModelOriented/shapper) and [shapper website](https://modeloriented.github.io/shapper/).
+
+SHAP (SHapley Additive exPlanations) is a method to explain predictions of any machine learning model. 
+For more details about this method see [shap repository on github](https://github.com/slundberg/shap).
+
+# Install shaper and shap
+
+## R package shapper
+
+```{r, eval = FALSE}
+library("shapper")
+```
+
+## Python library shap
+
+To run shapper python library shap is required. It can be installed both by python or R. To install it throught R, you an use function `install_shap` from the `shapper` package.
+
+```{r, eval = FALSE}
+shapper::install_shap()
+```
+
+
+# Load data sets
+
+The example usage is presented on the `titanic` dataset form the R package `titanic`. 
+
+```{r}
+library("titanic")
+titanic <- titanic_train[,c("Survived", "Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked")]
+titanic$Survived <- factor(titanic$Survived)
+titanic$Sex <- factor(titanic$Sex)
+titanic$Embarked <- factor(titanic$Embarked)
+titanic <- na.omit(titanic)
+head(titanic)
+```
+
+```
+  Survived Pclass    Sex Age SibSp Parch    Fare Embarked
+1        0      3   male  22     1     0  7.2500        S
+2        1      1 female  38     1     0 71.2833        C
+3        1      3 female  26     0     0  7.9250        S
+4        1      1 female  35     1     0 53.1000        S
+5        0      3   male  35     0     0  8.0500        S
+7        0      1   male  54     0     0 51.8625        S
+```
+
+# Let's build a model
+
+```{r}
+library("randomForest")
+set.seed(123)
+model_rf <- randomForest(Survived ~ . , data = titanic)
+model_rf
+```
+
+```
+Call:
+ randomForest(formula = Survived ~ ., data = titanic) 
+               Type of random forest: classification
+                     Number of trees: 500
+No. of variables tried at each split: 2
+
+        OOB estimate of  error rate: 18.63%
+Confusion matrix:
+    0   1 class.error
+0 384  40  0.09433962
+1  93 197  0.32068966
+```
+
+## Prediction to be explained
+
+Let's assume that we want to explain the prediction of a particular observation (male, 8 years old, traveling 1-st class embarked at C, without parents and siblings.
+
+```{r}
+new_passanger <- data.frame(
+            Pclass = 1,
+            Sex = factor("male", levels = c("female", "male")),
+            Age = 8,
+            SibSp = 0,
+            Parch = 0,
+            Fare = 72,
+            Embarked = factor("C", levels = c("","C","Q","S"))
+)
+```
+
+
+
+
+## Here shapper starts
+
+To use the function `shap()` function (alias for `individual_variable_effect()`) we need four elements
+
+* a model,
+* a data set,
+* a function that calculated scores (predict function),
+* an instance (or instances) to be explained.
+
+The `shap()` function can be used directly with these four arguments, but for the simplicity here we are using the *DALEX* package with preimplemented predict functions.
+
+
+```{r}
+library("DALEX")
+exp_rf <- explain(model_rf, data = titanic[,-1])
+```
+
+The explainer is an object that wraps up a model and meta-data. Meta data consists of, at least, the data set used to fit model and observations to explain. 
+
+And now it's enough to generate SHAP attributions with explainer for RF model.
+
+```{r}
+library("shapper")
+ive_rf <- shap(exp_rf, new_observation = new_passanger)
+ive_rf
+```
+
+```
+    Pclass  Sex Age SibSp Parch Fare Embarked _id_ _ylevel_ _yhat_ _yhat_mean_ _vname_ _attribution_ _sign_      _label_
+1        1 male   8     0     0   72        C    1        0  0.442   0.6327059  Pclass  -0.070047752      - randomForest
+1.2      1 male   8     0     0   72        C    1        0  0.442   0.6327059     Sex   0.154519708      + randomForest
+1.3      1 male   8     0     0   72        C    1        0  0.442   0.6327059     Age  -0.143046212      - randomForest
+1.4      1 male   8     0     0   72        C    1        0  0.442   0.6327059   SibSp  -0.003154522      - randomForest
+1.5      1 male   8     0     0   72        C    1        0  0.442   0.6327059   Parch   0.018111585      + randomForest
+1.6      1 male   8     0     0   72        C    1        0  0.442   0.6327059    Fare  -0.086728705      - randomForest
+```
+
+# Plotting results
+
+```{r}
+plot(ive_rf)
+```
+
+![](https://raw.githubusercontent.com/ModelOriented/shapper/master/materials/vignettes_plots/regression_plot1.png)
