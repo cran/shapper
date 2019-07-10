@@ -253,35 +253,26 @@ ive_tree &lt;- individual_variable_effect(model_tree, data = x_train, predict_fu
 <pre><code class="r">ive_rf
 </code></pre>
 
-<pre><code>    gender      age    hours evaluation salary _id_ _ylevel_ _yhat_ _yhat_mean_    _vname_ _attribution_ _sign_      _label_
-1     male 32.58267 41.88626          3      1    1    fired  0.854   0.3755216     gender   -0.03312199      - randomForest
-1.3   male 32.58267 41.88626          3      1    1    fired  0.854   0.3755216        age    0.02135603      + randomForest
-1.4   male 32.58267 41.88626          3      1    1    fired  0.854   0.3755216      hours    0.30846492      + randomForest
-1.5   male 32.58267 41.88626          3      1    1    fired  0.854   0.3755216 evaluation    0.11945970      + randomForest
-1.6   male 32.58267 41.88626          3      1    1    fired  0.854   0.3755216     salary    0.06231975      + randomForest
-1.1   male 32.58267 41.88626          3      1    1       ok  0.144   0.2758111     gender    0.02735491      + randomForest
-</code></pre>
-
 <h1>Plotting results</h1>
 
-<pre><code class="r">plot(ive_rf)
+<pre><code class="r">plot(ive_rf, bar_width = 4)
 </code></pre>
 
-<p><img src="https://raw.githubusercontent.com/ModelOriented/shapper/master/materials/vignettes_plots/classification_plot1.png" alt=""/></p>
+<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/plot1-1.png" alt=""/></p>
 
 <p>To see only attributions use option <code>show_predcited = FALSE</code>.</p>
 
-<pre><code class="r">plot(ive_rf, show_predcited = FALSE)
+<pre><code class="r">plot(ive_rf, show_predcited = FALSE, bar_width = 4)
 </code></pre>
 
-<p><img src="https://raw.githubusercontent.com/ModelOriented/shapper/master/materials/vignettes_plots/classification_plot2.png" alt=""/></p>
+<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-6-1.png" alt=""/></p>
 
 <p>We can show many models on one grid.</p>
 
-<pre><code class="r">plot(ive_rf, ive_tree, show_predcited = FALSE)
+<pre><code class="r">plot(ive_rf, ive_tree, show_predcited = FALSE, bar_width = 4)
 </code></pre>
 
-<p><img src="https://raw.githubusercontent.com/ModelOriented/shapper/master/materials/vignettes_plots/classification_plot3.png" alt=""/></p>
+<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-7-1.png" alt=""/></p>
 
 <h2>Let&#39;s filter data for plot</h2>
 
@@ -289,7 +280,7 @@ ive_tree &lt;- individual_variable_effect(model_tree, data = x_train, predict_fu
 shapper:::plot.individual_variable_effect(ive_rf_filtered)
 </code></pre>
 
-<p><img src="https://raw.githubusercontent.com/ModelOriented/shapper/master/materials/vignettes_plots/classification_plot4.png" alt=""/></p>
+<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-8-1.png" alt=""/></p>
 
 </body>
 

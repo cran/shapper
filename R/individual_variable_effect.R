@@ -15,6 +15,13 @@
 #' @param label name of the model. By default it’s extracted from the class attribute of the model
 #' @param method an estimation method of SHAP values. Currently the only availible is `KernelSHAP`.
 #' @param nsamples number of samples or "auto". Note that number must be as integer. Use `as.integer()`.
+#' 
+#'
+#' In order to use shapper with other python virtual environment following R command are required to execute 
+#' reticulate::use_virtualenv("path_to_your_env")
+#' or for conda
+#' reticulate::use_conda("name_of_conda_env")
+#' before attaching shapper.
 #'
 #' @return an object of class individual_variable_effect with shap values of each variable for each new observation.
 #' Columns:
@@ -60,125 +67,139 @@
 #'
 #' @rdname individual_variable_effect
 
-individual_variable_effect <- function(x, ...){
+individual_variable_effect <- function(x, ...) {
   UseMethod("individual_variable_effect")
 }
 
 
 #' @export
 #' @rdname individual_variable_effect
-individual_variable_effect.explainer <- function(x, new_observation,
-                                                 method = "KernelSHAP", nsamples = "auto",
-                                                 ...){
+individual_variable_effect.explainer <- function(x,
+                                                 new_observation,
+                                                 method = "KernelSHAP",
+                                                 nsamples = "auto",
+                                                 ...) {
   # extracts model, data and predict function from the explainer
   model <- x$model
   data <- x$data
   predict_function <- x$predict_function
   label <- x$label
-
-  individual_variable_effect.default(model, data, predict_function,
-                                     new_observation = new_observation,
-                                     label = label,
-                                     method = method,
-                                     nsamples = nsamples,
-                                     ...)
+  
+  individual_variable_effect.default(
+    model,
+    data,
+    predict_function,
+    new_observation = new_observation,
+    label = label,
+    method = method,
+    nsamples = nsamples,
+    ...
+  )
 }
 
 
 #' @importFrom utils tail
 #' @export
 #' @rdname individual_variable_effect
-individual_variable_effect.default <- function(x, data, predict_function = predict,
-                                               new_observation,
-                                               label = tail(class(x), 1),
-                                               method = "KernelSHAP",
-                                               nsamples = "auto",
-                                               ...){
-  # transform factors to numerics and keep factors' levels
-  data_classes <- sapply(data, class)
-  factors <- list()
-  data_numeric <- data
-  for(col in names(data_classes)){
-    if(data_classes[col] == "factor"){
-      factors[[col]] <- levels(data[,col])
-      data_numeric[ ,col] <- as.numeric(data_numeric[ ,col]) - 1
-    }
-  }
-
-  # force nsamples to be an integer
-  if (is.numeric(nsamples)) nsamples <- as.integer(round(nsamples))
-
-  p_function <- function(new_data) {
-    new_data <- as.data.frame(new_data)
-    colnames(new_data) <- colnames(data)
-    for(col in names(factors)){
-      new_data[ ,col] <- factor(new_data[ , col],
-                                levels = c(0:(length(factors[[col]])-1)),
-                                labels = factors[[col]]
-                                )
-    }
-    res <- as.data.frame(predict_function(x, new_data))
-    if(nrow(res) == 1) {
-      res[2,] <- 0
-      res <- r_to_py(res)
-      res$drop(res$index[1], inplace = TRUE)
-    }
-    return(res)
-  }
-  explainer = shap_reference$KernelExplainer(p_function, data_numeric)
-
-
-  new_observation_releveled <- new_observation
-  new_observation_numeric <- new_observation
-  for(col in names(factors)){
-      new_observation_releveled[ ,col] <- factor(new_observation_releveled[ ,col], levels = factors[[col]])
-      new_observation_numeric[,col] <- as.numeric(new_observation_releveled[,col]) - 1
-  }
-  shap_values = explainer$shap_values(new_observation_numeric, nsamples = nsamples)
-  expected_value = explainer$expected_value
-
-
-  predictions <- predict_function(x, new_observation_releveled)
-  variables <- colnames(data)
-
-  # create data to return
-  new_data <- new_observation
-  new_data$`_id_` <- c(1:nrow(new_data))
-
-  # add multiple predictions
-  new_data <- new_data[rep(1:nrow(new_data), each = length(shap_values)), ]
-  if(is.null(colnames(predictions))){
-    new_data$`_ylevel_` <- ""
-    new_data <- unique(new_data)
-  } else {
-    new_data$`_ylevel_` <- rep(colnames(predictions), times = nrow(new_observation))
-  }
-  new_data$`_yhat_` <- as.vector(t(predictions))
-  new_data$`_yhat_mean_` <- rep(expected_value, times = nrow(new_observation))
-
-  # add multiple variables
-  new_data <- new_data[rep(1:nrow(new_data), each = ncol(data)), ]
-  new_data$`_vname_` <- rep(variables, times = length(predictions))
-
-  attribution <- numeric()
-  for(i in 1: nrow(new_observation)){
-    for(j in 1:length(shap_values)){
-      shap_attributes <- shap_values[[j]]
-      if(is.matrix(shap_attributes)) {
-        attribution <- c(attribution, shap_attributes[i,] )
-      } else {
-        attribution <- c(attribution, shap_attributes[i] )
+individual_variable_effect.default <-
+  function(x,
+           data,
+           predict_function = predict,
+           new_observation,
+           label = tail(class(x), 1),
+           method = "KernelSHAP",
+           nsamples = "auto",
+           ...) {
+    # transform factors to numerics and keep factors' levels
+    data_classes <- sapply(data, class)
+    factors <- list()
+    data_numeric <- data
+    for (col in names(data_classes)) {
+      if (data_classes[col] == "factor") {
+        factors[[col]] <- levels(data[, col])
+        data_numeric[, col] <- as.numeric(data_numeric[, col]) - 1
       }
     }
+    
+    # force nsamples to be an integer
+    if (is.numeric(nsamples))
+      nsamples <- as.integer(round(nsamples))
+    
+    p_function <- function(new_data) {
+      new_data <- as.data.frame(new_data)
+      colnames(new_data) <- colnames(data)
+      for (col in names(factors)) {
+        new_data[, col] <- factor(new_data[, col],
+                                  levels = c(0:(length(factors[[col]]) - 1)),
+                                  labels = factors[[col]])
+      }
+      res <- as.data.frame(predict_function(x, new_data))
+      if (nrow(res) == 1) {
+        res[2, ] <- 0
+        res <- r_to_py(res)
+        res$drop(res$index[1], inplace = TRUE)
+      }
+      return(res)
+    }
+    explainer = shap_reference$KernelExplainer(p_function, data_numeric)
+    
+    
+    new_observation_releveled <- new_observation
+    new_observation_numeric <- new_observation
+    for (col in names(factors)) {
+      new_observation_releveled[, col] <-
+        factor(new_observation_releveled[, col], levels = factors[[col]])
+      new_observation_numeric[, col] <-
+        as.numeric(new_observation_releveled[, col]) - 1
+    }
+    shap_values = explainer$shap_values(new_observation_numeric, nsamples = nsamples)
+    expected_value = explainer$expected_value
+    
+    
+    predictions <- predict_function(x, new_observation_releveled)
+    variables <- colnames(data)
+    
+    # create data to return
+    new_data <- new_observation
+    new_data$`_id_` <- c(1:nrow(new_data))
+    
+    # add multiple predictions
+    new_data <-
+      new_data[rep(1:nrow(new_data), each = length(shap_values)),]
+    if (is.null(colnames(predictions))) {
+      new_data$`_ylevel_` <- ""
+      new_data <- unique(new_data)
+    } else {
+      new_data$`_ylevel_` <-
+        rep(colnames(predictions), times = nrow(new_observation))
+    }
+    new_data$`_yhat_` <- as.vector(t(predictions))
+    new_data$`_yhat_mean_` <-
+      rep(expected_value, times = nrow(new_observation))
+    
+    # add multiple variables
+    new_data <- new_data[rep(1:nrow(new_data), each = ncol(data)),]
+    new_data$`_vname_` <- rep(variables, times = length(predictions))
+    
+    attribution <- numeric()
+    for (i in 1:nrow(new_observation)) {
+      for (j in 1:length(shap_values)) {
+        shap_attributes <- shap_values[[j]]
+        if (is.matrix(shap_attributes)) {
+          attribution <- c(attribution, shap_attributes[i, ])
+        } else {
+          attribution <- c(attribution, shap_attributes[i])
+        }
+      }
+    }
+    new_data$`_attribution_` <- attribution
+    new_data$`_sign_` <- factor(sign(new_data$`_attribution`))
+    new_data$`_sign_` <- ifelse(new_data$`_sign_` == 1, "+", "-")
+    new_data$`_label_` <- label
+    
+    class(new_data) <- c("individual_variable_effect", "data.frame")
+    return(new_data)
   }
-  new_data$`_attribution_` <- attribution
-  new_data$`_sign_` <- factor(sign(new_data$`_attribution`))
-  new_data$`_sign_` <- ifelse(new_data$`_sign_` == 1, "+", "-")
-  new_data$`_label_` <- label
-
-  class(new_data) <- c("individual_variable_effect", "data.frame")
-  return(new_data)
-}
 
 #' @export
 #' @rdname individual_variable_effect
