@@ -224,22 +224,22 @@ For more details about this method see <a href="https://github.com/slundberg/sha
 
 <h1>Load data sets</h1>
 
-<p>The example usage is presented on the <code>titanic</code> dataset form the R package <code>titanic</code>. </p>
+<p>The example usage is presented on the <code>titanic</code> dataset form the R package <code>DALEX</code>. </p>
 
-<pre><code class="r">library(&quot;titanic&quot;)
-titanic &lt;- titanic_train[,c(&quot;Survived&quot;, &quot;Pclass&quot;, &quot;Sex&quot;, &quot;Age&quot;, &quot;SibSp&quot;, &quot;Parch&quot;, &quot;Fare&quot;, &quot;Embarked&quot;)]
-titanic$Survived &lt;- factor(titanic$Survived)
-titanic$Sex &lt;- factor(titanic$Sex)
-titanic$Embarked &lt;- factor(titanic$Embarked)
-titanic &lt;- na.omit(titanic)
-head(titanic)
+<pre><code class="r">library(&quot;DALEX&quot;)
+titanic_train &lt;- titanic[,c(&quot;survived&quot;, &quot;class&quot;, &quot;gender&quot;, &quot;age&quot;, &quot;sibsp&quot;, &quot;parch&quot;, &quot;fare&quot;, &quot;embarked&quot;)]
+titanic_train$survived &lt;- factor(titanic_train$survived)
+titanic_train$gender &lt;- factor(titanic_train$gender)
+titanic_train$embarked &lt;- factor(titanic_train$embarked)
+titanic_train &lt;- na.omit(titanic_train)
+head(titanic_train)
 </code></pre>
 
 <h1>Let&#39;s build a model</h1>
 
 <pre><code class="r">library(&quot;randomForest&quot;)
 set.seed(123)
-model_rf &lt;- randomForest(Survived ~ . , data = titanic)
+model_rf &lt;- randomForest(survived ~ . , data = titanic_train)
 model_rf
 </code></pre>
 
@@ -248,13 +248,13 @@ model_rf
 <p>Let&#39;s assume that we want to explain the prediction of a particular observation (male, 8 years old, traveling 1-st class embarked at C, without parents and siblings.</p>
 
 <pre><code class="r">new_passanger &lt;- data.frame(
-            Pclass = 1,
-            Sex = factor(&quot;male&quot;, levels = c(&quot;female&quot;, &quot;male&quot;)),
-            Age = 8,
-            SibSp = 0,
-            Parch = 0,
-            Fare = 72,
-            Embarked = factor(&quot;C&quot;, levels = c(&quot;&quot;,&quot;C&quot;,&quot;Q&quot;,&quot;S&quot;))
+            class = factor(&quot;1st&quot;, levels = c(&quot;1st&quot;, &quot;2nd&quot;, &quot;3rd&quot;, &quot;deck crew&quot;, &quot;engineering crew&quot;, &quot;restaurant staff&quot;, &quot;victualling crew&quot;)),
+            gender = factor(&quot;male&quot;, levels = c(&quot;female&quot;, &quot;male&quot;)),
+            age = 8,
+            sibsp = 0,
+            parch = 0,
+            fare = 72,
+            embarked = factor(&quot;Cherbourg&quot;, levels = c(&quot;Belfast&quot;, &quot;Cherbourg&quot;, &quot;Queenstown&quot;, &quot;Southampton&quot;))
 )
 </code></pre>
 
@@ -272,7 +272,7 @@ model_rf
 <p>The <code>shap()</code> function can be used directly with these four arguments, but for the simplicity here we are using the <em>DALEX</em> package with preimplemented predict functions.</p>
 
 <pre><code class="r">library(&quot;DALEX&quot;)
-exp_rf &lt;- explain(model_rf, data = titanic[,-1])
+exp_rf &lt;- explain(model_rf, data = titanic_train[,-1], y = as.numeric(titanic_train[,1])-1)
 </code></pre>
 
 <p>The explainer is an object that wraps up a model and meta-data. Meta data consists of, at least, the data set used to fit model and observations to explain. </p>
@@ -289,7 +289,7 @@ ive_rf
 <pre><code class="r">plot(ive_rf)
 </code></pre>
 
-<p><img src="https://modeloriented.github.io/shapper/articles/shapper_regression_files/figure-html/unnamed-chunk-8-1.png" alt=""/></p>
+<p><a href="https://modeloriented.github.io/shapper/articles/shapper_regression_files/figure-html/unnamed-chunk-8-1.png"></a></p>
 
 </body>
 

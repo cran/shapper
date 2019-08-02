@@ -217,7 +217,7 @@ For more details about this method see <a href="https://github.com/slundberg/sha
 
 <h1>Load data sets</h1>
 
-<p>The example usage is presented on the <code>HR</code> dataset from the R package <code>DALEX</code>. For more details see <a href="https://github.com/ModelOriented/DALEX2">DALEX2 github repository</a>.</p>
+<p>The example usage is presented on the <code>HR</code> dataset from the R package <code>DALEX</code>. For more details see <a href="https://github.com/pbiecek/DALEX">DALEX github repository</a>.</p>
 
 <pre><code class="r">library(&quot;DALEX&quot;)
 Y_train &lt;- HR$status
@@ -258,21 +258,21 @@ ive_tree &lt;- individual_variable_effect(model_tree, data = x_train, predict_fu
 <pre><code class="r">plot(ive_rf, bar_width = 4)
 </code></pre>
 
-<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/plot1-1.png" alt=""/></p>
+<p><a href="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/plot1-1.png"></a></p>
 
-<p>To see only attributions use option <code>show_predcited = FALSE</code>.</p>
+<p>To see only attributions use option <code>show_predicted = FALSE</code>.</p>
 
-<pre><code class="r">plot(ive_rf, show_predcited = FALSE, bar_width = 4)
+<pre><code class="r">plot(ive_rf, show_predicted = FALSE, bar_width = 4)
 </code></pre>
 
-<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-6-1.png" alt=""/></p>
+<p><a href="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-6-1.png"></a></p>
 
 <p>We can show many models on one grid.</p>
 
-<pre><code class="r">plot(ive_rf, ive_tree, show_predcited = FALSE, bar_width = 4)
+<pre><code class="r">plot(ive_rf, ive_tree, show_predicted = FALSE, bar_width = 4)
 </code></pre>
 
-<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-7-1.png" alt=""/></p>
+<p><a href="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-7-1.png"></a></p>
 
 <h2>Let&#39;s filter data for plot</h2>
 
@@ -280,7 +280,7 @@ ive_tree &lt;- individual_variable_effect(model_tree, data = x_train, predict_fu
 shapper:::plot.individual_variable_effect(ive_rf_filtered)
 </code></pre>
 
-<p><img src="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-8-1.png" alt=""/></p>
+<p><a href="https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-8-1.png"></a></p>
 
 </body>
 

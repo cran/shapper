@@ -37,9 +37,9 @@ shapper::install_shap()
 
 # Load data sets
 
-The example usage is presented on the `HR` dataset from the R package `DALEX`. For more details see [DALEX2 github repository](https://github.com/ModelOriented/DALEX2).
+The example usage is presented on the `HR` dataset from the R package `DALEX`. For more details see [DALEX github repository](https://github.com/pbiecek/DALEX).
 
-```{r eval = FALSE, message=FALSE}
+```{r eval = FALSE}
 library("DALEX")
 Y_train <- HR$status
 x_train <- HR[ , -6]
@@ -48,7 +48,7 @@ x_train <- HR[ , -6]
 
 # Let's build models
 
-```{r eval = FALSE, message=FALSE}
+```{r eval = FALSE}
 library("randomForest")
 set.seed(123)
 model_rf <- randomForest(x = x_train, y = Y_train)
@@ -80,25 +80,24 @@ ive_rf
 
 # Plotting results
 
-
 ```{r eval = FALSE}
 plot(ive_rf, bar_width = 4)
 ```
-![](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/plot1-1.png)
+[](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/plot1-1.png)
 
-To see only attributions use option `show_predcited = FALSE`.
+To see only attributions use option `show_predicted = FALSE`.
 
 ```{r eval = FALSE}
-plot(ive_rf, show_predcited = FALSE, bar_width = 4)
+plot(ive_rf, show_predicted = FALSE, bar_width = 4)
 ```
-![](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-6-1.png)
+[](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-6-1.png)
 
 We can show many models on one grid.
 
 ```{r eval = FALSE}
-plot(ive_rf, ive_tree, show_predcited = FALSE, bar_width = 4)
+plot(ive_rf, ive_tree, show_predicted = FALSE, bar_width = 4)
 ```
-![](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-7-1.png)
+[](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-7-1.png)
 
 ## Let's filter data for plot
 
@@ -107,4 +106,4 @@ plot(ive_rf, ive_tree, show_predcited = FALSE, bar_width = 4)
 ive_rf_filtered <- ive_rf[ive_rf$`_ylevel_` =="fired", ]
 shapper:::plot.individual_variable_effect(ive_rf_filtered)
 ```
-![](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-8-1.png)
+[](https://modeloriented.github.io/shapper/articles/shapper_classification_files/figure-html/unnamed-chunk-8-1.png)

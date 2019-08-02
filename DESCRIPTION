@@ -1,6 +1,6 @@
 Package: shapper
 Title: Wrapper of Python Library 'shap'
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
   person("Szymon", "Maksymiuk", email = "sz.maksymiuk@gmail.com", role = c("aut", "cre")),
   person("Alicja", "Gosiewska", email = "alicjagosiewska@gmail.com", role = c("aut")),
@@ -16,11 +16,10 @@ URL: https://github.com/ModelOriented/shapper
 BugReports: https://github.com/ModelOriented/shapper/issues
 RoxygenNote: 6.1.1
 Imports: reticulate, ggplot2
-Suggests: covr, DALEX, knitr, randomForest, rpart, testthat, titanic,
-        qpdf
+Suggests: covr, DALEX, knitr, randomForest, rpart, testthat, qpdf
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2019-07-10 11:19:22 UTC; szyna
+Packaged: 2019-08-02 10:10:35 UTC; szyna
 Author: Szymon Maksymiuk [aut, cre],
   Alicja Gosiewska [aut],
   Przemyslaw Biecek [aut],
@@ -28,4 +27,4 @@ Author: Szymon Maksymiuk [aut, cre],
   Michal Burdukiewicz [ctb]
 Maintainer: Szymon Maksymiuk <sz.maksymiuk@gmail.com>
 Repository: CRAN
-Date/Publication: 2019-07-10 11:50:03 UTC
+Date/Publication: 2019-08-02 10:30:02 UTC

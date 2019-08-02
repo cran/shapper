@@ -3,47 +3,47 @@ knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
                       warning = FALSE)
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval=FALSE----------------------------------------------------------
 #  library("shapper")
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  shapper::install_shap()
 
-## ----eval = FALSE--------------------------------------------------------
-#  library("titanic")
-#  titanic <- titanic_train[,c("Survived", "Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked")]
-#  titanic$Survived <- factor(titanic$Survived)
-#  titanic$Sex <- factor(titanic$Sex)
-#  titanic$Embarked <- factor(titanic$Embarked)
-#  titanic <- na.omit(titanic)
-#  head(titanic)
+## ----eval=FALSE----------------------------------------------------------
+#  library("DALEX")
+#  titanic_train <- titanic[,c("survived", "class", "gender", "age", "sibsp", "parch", "fare", "embarked")]
+#  titanic_train$survived <- factor(titanic_train$survived)
+#  titanic_train$gender <- factor(titanic_train$gender)
+#  titanic_train$embarked <- factor(titanic_train$embarked)
+#  titanic_train <- na.omit(titanic_train)
+#  head(titanic_train)
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval=FALSE----------------------------------------------------------
 #  library("randomForest")
 #  set.seed(123)
-#  model_rf <- randomForest(Survived ~ . , data = titanic)
+#  model_rf <- randomForest(survived ~ . , data = titanic_train)
 #  model_rf
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval=FALSE----------------------------------------------------------
 #  new_passanger <- data.frame(
-#              Pclass = 1,
-#              Sex = factor("male", levels = c("female", "male")),
-#              Age = 8,
-#              SibSp = 0,
-#              Parch = 0,
-#              Fare = 72,
-#              Embarked = factor("C", levels = c("","C","Q","S"))
+#              class = factor("1st", levels = c("1st", "2nd", "3rd", "deck crew", "engineering crew", "restaurant staff", "victualling crew")),
+#              gender = factor("male", levels = c("female", "male")),
+#              age = 8,
+#              sibsp = 0,
+#              parch = 0,
+#              fare = 72,
+#              embarked = factor("Cherbourg", levels = c("Belfast", "Cherbourg", "Queenstown", "Southampton"))
 #  )
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval=FALSE----------------------------------------------------------
 #  library("DALEX")
-#  exp_rf <- explain(model_rf, data = titanic[,-1])
+#  exp_rf <- explain(model_rf, data = titanic_train[,-1], y = as.numeric(titanic_train[,1])-1)
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval=FALSE----------------------------------------------------------
 #  library("shapper")
 #  ive_rf <- shap(exp_rf, new_observation = new_passanger)
 #  ive_rf
 
-## ----eval = FALSE--------------------------------------------------------
+## ----eval=FALSE----------------------------------------------------------
 #  plot(ive_rf)
 
