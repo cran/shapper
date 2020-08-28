@@ -1,5 +1,11 @@
-shapper 0.1.2
+shapper 0.1.3
+----------------------------------------------------------------
+* `id` param for `plot.individual_variable_effect` now works as intended. Thanks (#27)
+* Removed duplicated functions from `DALEX`
+* `shapper` now imports `DALEX`
 
+shapper 0.1.2
+----------------------------------------------------------------
 * #12 issue fix
 * #13 issue exception for column mismatch added 
 * added tryCatch to .onLoad to prevent packages crashes when shap is not available

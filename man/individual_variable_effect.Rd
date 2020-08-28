@@ -9,12 +9,24 @@
 \usage{
 individual_variable_effect(x, ...)
 
-\method{individual_variable_effect}{explainer}(x, new_observation,
-  method = "KernelSHAP", nsamples = "auto", ...)
+\method{individual_variable_effect}{explainer}(
+  x,
+  new_observation,
+  method = "KernelSHAP",
+  nsamples = "auto",
+  ...
+)
 
-\method{individual_variable_effect}{default}(x, data,
-  predict_function = predict, new_observation, label = tail(class(x),
-  1), method = "KernelSHAP", nsamples = "auto", ...)
+\method{individual_variable_effect}{default}(
+  x,
+  data,
+  predict_function = predict,
+  new_observation,
+  label = tail(class(x), 1),
+  method = "KernelSHAP",
+  nsamples = "auto",
+  ...
+)
 
 shap(x, ...)
 }
@@ -82,7 +94,7 @@ if(have_shap){
   ive_rf <- individual_variable_effect(model_rf, data = x_train, predict_function = p_function,
                                      new_observation = x_train[1:2,], nsamples = 50)
   ive_rf
-}else{
+} else{
     print('Python testing environment is required.')
 }
 
